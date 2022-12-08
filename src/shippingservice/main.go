@@ -25,15 +25,15 @@ import (
 
 	"github.com/sirupsen/logrus"
 	// Workshop - Add Trace Instrumentation <- HERE
-	// "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	// "go.opentelemetry.io/otel"
-	// "go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	// "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	// "go.opentelemetry.io/otel/propagation"
-	// "go.opentelemetry.io/otel/sdk/resource"
-	// sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	// semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
-	// "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+	"go.opentelemetry.io/otel/trace"
 
 	// Workshop - Span Attributes <- HERE
 
