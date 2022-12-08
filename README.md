@@ -1,205 +1,40 @@
-# OpenTelemetry on the Cloud
+[![New Relic Experimental header](https://github.com/newrelic/opensource-website/raw/master/src/images/categories/Experimental.png)](https://opensource.newrelic.com/oss-category/#new-relic-experimental)
 
-The goal of this workshop is to see first hand the power of OpenTelemetry for cloud native applications
+# DevRel Workshop - OpenTelemetry with New Relic
 
-## Prerequisites
+OpenTelemetry, often referred to as OTel for short, is a vendor-neutral open-source observability framework for instrumenting, generating, collecting, and exporting telemetry data (metrics, logs, and traces). As an industry standard steadily gaining in popularity, it is natively supported by a number of observability vendors including New Relic.
 
-[**Install Minikube**](https://minikube.sigs.k8s.io/docs/start/) 
+In this workshop, you will get hands-on experience with an application that can leverage the FluentBit, OpenTelemetry, and Kubernetes stack. You will instrument the application and interact directly with several core components of OpenTelemetry.
 
-[**Install kubectl**](https://kubernetes.io/docs/tasks/tools/)
+## What do you need to make this work?
 
-[**Install Skaffold**](https://skaffold.dev/)
+## New Relic One Account
 
-**From a terminal with administrator access (but not as root), run** 
+Free access to all of New Relic. No credit card required. [Sign Up for Free](https://newrelic.com/signup). 
 
-```bash
-minikube start --memory 8192 --cpus 6
-```
+## Getting Started
 
-*This application is resource heavy so get ready for some 💨*
+Follow the instructions as described [here](https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#overview-keys) on how to create your first Ingest api key.
 
-**Check that your cluster is up and running by running**
+## DevRel Workshop - OpenTelemetry with New Relic
 
-```bash
-kubectl get nodes
-```
+This is the main code used in the hands on workshop that is conducted by DevRel New Relic. The sample code is available for your own reference.
 
-**Clone the repo for the sample application** 
+## Support
 
-```bash
-git clone https://github.com/newrelic-experimental/otel-workshop.git
-```
+The code is part of New Relic experimental. The project is being developed in the open and we welcome all feedback and contributions.
 
-**Export env variables** 
+## Contributing
 
-```bash
-export OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp.nr-data.net:4317
-export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://otlp.nr-data.net:4317
-export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://otlp.nr-data.net:4317
-export OTEL_EXPORTER_OTLP_HEADERS=api-key=<NEWRELIC_INGEST_LICENSE_KEY>
-export NEW_RELIC_API_KEY=<NEWRELIC_INGEST_LICENSE_KEY>
-export NEW_RELIC_LICENSE_KEY=<NEWRELIC_INGEST_LICENSE_KEY>
-export NEW_RELIC_HOST=collector.newrelic.com
-```
+We encourage your contributions to improve DevRel Workshop - O11y As Code - Terraform! Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
+If you have any questions, or to execute our corporate CLA, required if your contribution is on behalf of a company,  please drop us an email at opensource@newrelic.com.
 
-**Run Skaffold**
+**A note about vulnerabilities**
 
-*Note that this step will take ~15-20 minutes the first time you run this command because Docker has to build and push each of the microservices*
+As noted in our [security policy](../../security/policy), New Relic is committed to the privacy and security of our customers and their data. We believe that providing coordinated disclosure by security researchers and engaging with the security community are important means to achieve our security goals.
 
-```bash
-skaffold dev
-```
+If you believe you have found a security vulnerability in this project or any of New Relic's products or websites, we welcome and greatly appreciate you reporting it to New Relic through [HackerOne](https://hackerone.com/newrelic).
 
-## Adding a delay
+## License
 
-Your first mission is to add an artificial delay in one of the functions to see the full power of OpenTelemetry and distributed tracing. Let’s say we want to know what exactly causes a delay in the frontend? Distributed tracing makes it easy for you to follow the journey of a request as it travels throughout your system.  
-
-![Screen Shot 2022-05-15 at 5.02.10 PM.png](images/Screen_Shot_2022-05-15_at_5.02.10_PM.png)
-
-<aside>
-📜 **In `main.go`, add a 0.1sec delay for the `createQuoteFromCount` and a 0.33 sec delay for `CreateQuoteFromFloat`functions.**
-
-When you head into New Relic distributed tracing you should see something like this for your Distributed trace with your artificial delay clearly visible.
-
-![Screen Shot 2022-05-15 at 5.27.50 PM.png](images/Screen_Shot_2022-05-15_at_5.27.50_PM.png)
-
-- **🙈 Solution**
-    
-    ```go
-    func CreateQuoteFromCount(value float64) Quote {
-    	...
-    	time.Sleep(time.Second / 10)
-    	...
-    }
-    ```
-    
-    ```go
-    func CreateQuoteFromFloat(value float64) Quote {
-    	...
-    	time.Sleep(time.Second / 3)
-    	...
-    }
-    ```
-    
-</aside>
-
-## **Building spans**
-
-However, let’s say we want to get one level deeper and want to see what caused the spike in the application. You are able to add custom spans to 
-
-<aside>
-📜 **In the `GetQuote`function in `main.go`, build individual spans for the `createQuoteFromCount` and `CreateQuoteFromFloat`functions**
-
-![Screen Shot 2022-05-15 at 5.44.23 PM.png](images/Screen_Shot_2022-05-15_at_5.44.23_PM.png)
-
-- **🙈 Solution**
-    
-    ```go
-    func CreateQuoteFromCount(value float64 , ctx context.Context) Quote {
-    	ctx, childSpan := tracer.Start(ctx, "CreateQuoteFromCount")
-    	defer childSpan.End()
-    	...
-    }
-    ```
-    
-    ```go
-    func CreateQuoteFromFloat(value float64 , ctx context.Context) Quote {
-    	ctx, childSpan := tracer.Start(ctx, "CreateQuoteFromFloat")
-    	defer childSpan.End()
-    	...
-    }
-    ```
-    
-    ```go
-    func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
-    		// 1. Generate a quote based on the total number of items to be shipped.
-    	quote := CreateQuoteFromCount(0, ctx)
-    }
-    ```
-    
-</aside>
-
-## Adding **span attributes**
-
-Let’s say that you wanted to add more context into the traces so you can get more business insights out of your data.
-
-Attributes are keys and values that are applied as metadata to your spans and are useful for aggregating, filtering, and grouping traces. [Attributes](https://opentelemetry.io/docs/instrumentation/go/manual/#span-attributes) can be added at span creation, or at any other time during the lifecycle of a span before it has completed. 
-
-<aside>
-📜 **In the `ShipOrder`function in `main.go`, add code to attach the `state`, `zipcode` , and `city` attributes to each `shipOrder` span you created in the previous step!**
-
-> When you are finished you should be able to see the attributes you added when you click on the shipOrder span → attributes tab on the right panel.
-> 
-
-![Screen Shot 2022-05-15 at 2.59.42 PM.png](images/Screen_Shot_2022-05-15_at_2.59.42_PM.png)
-
-> You should be able to run the `NRQL` query 
-`SELECT count(*) FROM Span WHERE entity.name='shippingservice' FACET state`
-to get the breakdown of all orders processed by state
-> 
-
-![Screen Shot 2022-05-15 at 5.38.11 PM.png](images/Screen_Shot_2022-05-15_at_5.38.11_PM.png)
-
-- **🙈 Solution**
-    ```go
-    import (
-        ...
-        "go.opentelemetry.io/otel/attribute"
-    }
-    ```
-    
-    ```go
-    func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.ShipOrderResponse, error) {
-    ...
-    	parentSpan.SetAttributes(
-    		attribute.String("address", baseAddress), 
-    		attribute.String("city", in.Address.City), 
-    		attribute.String("state", in.Address.State))
-    ****}
-    ```
-    
-</aside>
-
-## Adding Errors
-
-Unlike system exceptions, application exceptions allow you to bubble up application-level activity that might cause errors, for example, invalid input argument values to a business method. 
-
-<aside>
-📜 **In the `ShipOrder`function in `main.go`, add some logic to throw an error when a zip code is not a 5 digit number. It should show up like the screenshot below in NR1.**
-
-![Screen Shot 2022-05-15 at 5.46.42 PM.png](images/Screen_Shot_2022-05-15_at_5.46.42_PM.png)
-
-- **🙈 Solution**
-    
-    ```go
-    func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.ShipOrderResponse, error) {
-    ...
-    **if(in.Address.ZipCode < 10000 || in.Address.ZipCode > 99999){
-           parentSpan.SetStatus(1, "zipcode is invalid") 
-       }**
-    }
-    ```
-    
-</aside>
-
-### Setting the status for span
-
-Following the [OTel specification for the Tracing API](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#statuscanonicalcode) , SetStatus sets the status of the Span in the form of a code and a description, overriding previous values set. 
-
-The optional `Description` field provides a descriptive message of the `Status`. 
-
-`Description` MUST only be used with the `Error` `StatusCode` value. An empty `Description` is equivalent with a not present one.
-
-```glsl
-SetStatus(code codes.Code, description string)
-```
-
-### What to set a status code
-
-`**StatusCode` is one of the following values:**
-
-`Unset` (code = 0 or unset) The default status.
-
-`Ok` (code  = 2) The operation has been validated by an Application developer or Operator to have completed successfully.
-
-`Error` (code = 1) The operation contains an error.
+DevRel Workshop - O11y As Code - Terraform is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
