@@ -24,18 +24,18 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
-	"go.opentelemetry.io/otel/trace"
+	// Workshop - Add Trace Instrumentation <- HERE
+	// "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	// "go.opentelemetry.io/otel"
+	// "go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	// "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	// "go.opentelemetry.io/otel/propagation"
+	// "go.opentelemetry.io/otel/sdk/resource"
+	// sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	// semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+	// "go.opentelemetry.io/otel/trace"
 
-	// FOK Workshop - Span Attributes
-
+	// Workshop - Span Attributes <- HERE
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -164,12 +164,13 @@ func (s *server) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_Watc
 }
 
 // GetQuote produces a shipping quote (cost) in USD.
+// Workshop - Building spans <- HERE
 func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
-	
+
 	log.Info("[GetQuote] received request")
 	defer log.Info("[GetQuote] completed request")
 
-	// FOK Workshop - Building Spans
+	// Workshop - Building Spans <- HERE
 	quote := CreateQuoteFromCount(0)
 
 	// Generate a response.
@@ -184,22 +185,20 @@ func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQ
 
 // ShipOrder mocks that the requested items will be shipped.
 // It supplies a tracking ID for notional lookup of shipment delivery status.
+// Workshop - Span attributes <- HERE
 func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.ShipOrderResponse, error) {
-	
-	// FOK Workshop - Span Attributes
 
+	// Workshop - Adding Errors <- HERE
 
 	log.Info("[ShipOrder] received request")
 	defer log.Info("[ShipOrder] completed request")
-	
+
 	// 1. Create a Tracking ID
 	baseAddress := fmt.Sprintf("%s, %s, %s, %d", in.Address.StreetAddress, in.Address.City, in.Address.State, in.Address.ZipCode)
-	
-	// FOK Workshop - Span Attributes
 
-	
-	// FOK Workshop - Adding Errors
+	// Workshop - Span Attributes <- HERE
 
+	// Workshop - Adding Errors <- HERE
 
 	id := CreateTrackingId(baseAddress)
 
@@ -215,27 +214,24 @@ func (q Quote) String() string {
 }
 
 // CreateQuoteFromCount takes a number of items and returns a Price struct.
-// FOK Workshop - Building spans
+// Workshop - Building spans <- HERE
 func CreateQuoteFromCount(count int) Quote {
 
-	// FOK Workshop - Building Spans
+	// Workshop - Building Spans <- HERE
 
+	// Workshop - Adding a Delay <- HERE
 
-	// FOK Workshop - Adding a Delay
-
-	// FOK Workshop - Building Spans
+	// Workshop - Building Spans <- HERE
 	return CreateQuoteFromFloat(float64(rand.Intn(100)))
 }
 
 // CreateQuoteFromFloat takes a price represented as a float and creates a Price struct.
-// FOK Workshop - Building Spans
+// Workshop - Building Spans <- HERE
 func CreateQuoteFromFloat(value float64) Quote {
-	
-	// FOK Workshop - Building Spans
 
+	// Workshop - Building Spans <- HERE
 
-	// FOK Workshop - Adding a Delay
-
+	// Workshop - Adding a Delay <- HERE
 
 	units, fraction := math.Modf(value)
 	return Quote{

@@ -1,13 +1,13 @@
 ---
 receivers:
-  # FOK Workshop - Receivers - hostmetrics
+  # Workshop - Receivers - hostmetrics <- HERE
 
   otlp:
     protocols:
       grpc:
 
 processors:
-  # FOK Workshop - Processors - tail based sampling
+  # Workshop - Processors - tail based sampling <- HERE
 
   batch:
   cumulativetodelta:
@@ -52,12 +52,12 @@ exporters:
 
 service:
   pipelines:
-    # FOK Workshop - Receivers - hostmetrics
+    # Workshop - Receivers - hostmetrics <- HERE
     metrics:
       receivers: [ otlp ]
       processors: [ resourcedetection, k8sattributes, resource, cumulativetodelta, batch ]
       exporters: [ otlp ]
-    # FOK Workshop - Processors - tail based sampling
+    # Workshop - Processors - tail based sampling <- HERE
     traces:
       receivers: [ otlp ]
       processors: [ resourcedetection, k8sattributes, resource, batch ]

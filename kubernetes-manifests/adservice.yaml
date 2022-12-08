@@ -62,11 +62,11 @@ spec:
           value: "http://$(HOST_IP):4317"
         resources:
           requests:
-            cpu: 600m
-            memory: 840Mi
+            cpu: 1000m
+            memory: 1680Mi
           limits:
-            cpu: 600m
-            memory: 1200Mi
+            cpu: 1800m
+            memory: 2400Mi
         readinessProbe:
           initialDelaySeconds: 90
           periodSeconds: 15
